@@ -41,7 +41,7 @@ for document in magnets.find({'files': {'$exists': True}}):
                 downloads.update_one(
                     {'_id': document['title']},
                     {
-                        '$set': {'title': document['title']},
+                        '$set': {'title': document['title'], 'dbid': document['dbid']},
                         '$push': {'files': value, 'extra': info}
                     }, upsert=True
                 )
@@ -52,7 +52,7 @@ for document in magnets.find({'files': {'$exists': True}}):
                 downloads.update_one(
                     {'_id': key},
                     {
-                        '$set': {'title': document['title'], 'episode': episode},
+                        '$set': {'title': document['title'], 'dbid': document['dbid'], 'episode': episode},
                         '$push': {'files': value, 'extra': info}
                     }, upsert=True
                 )
@@ -103,7 +103,7 @@ for document in nzbs.find():
             downloads.update_one(
                 {'_id': key},
                 {
-                    '$set': {'title': info['title'], 'episode': episode},
+                    '$set': {'title': info['title'], 'dbid': document['dbid'], 'episode': episode},
                     '$push': {'files': value, 'extra': info}
                 }, upsert=True
             )
