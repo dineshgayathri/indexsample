@@ -4,7 +4,6 @@ import json
 import codecs
 import time
 import pymongo
-import random
 from configparser import ConfigParser
 
 parser = ConfigParser()
@@ -55,7 +54,7 @@ def scrape_this(root_url, ll, sitemap_file):
             to_scrap.append(url)
 
         print("Going over XMLs...")
-        for url in random.sample(to_scrap, parser.getint('yts', 'to_scrap')): #XXX to_scrap
+        for url in help_routines.sample(to_scrap, parser.getint('yts', 'to_scrap')): #XXX to_scrap
             print(url)
             source = requests.get(url).text
             try:

@@ -4,7 +4,6 @@ import os
 import codecs
 import re
 import time
-import random
 import pymongo
 import guessit
 from configparser import ConfigParser
@@ -67,7 +66,7 @@ def scrape_this(root_url, ll, sitemap_file):
             to_scrap.append(url)
 
         print("Going over XMLs...")
-        for url in random.sample(to_scrap, parser.getint('limetorrents', 'to_scrap')): #XXX to_scrap
+        for url in help_routines.sample(to_scrap, parser.getint('limetorrents', 'to_scrap')): #XXX to_scrap
             print(url)
             source = requests.get(url).text
             soup = bs4.BeautifulSoup(source, 'xml')
@@ -88,7 +87,7 @@ def scrape_this(root_url, ll, sitemap_file):
 
     mondb = cdb.magnets
     err_count = 0
-    for url in random.sample(pages, parser.getint('limetorrents', 'pages')): #XXX pages
+    for url in help_routines.sample(pages, parser.getint('limetorrents', 'pages')): #XXX pages
 
         print(url)
         source = requests.get(url).text

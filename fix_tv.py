@@ -32,8 +32,7 @@ def main():
         updates = {}
         if len(r['tv_results']) == 1:
             if document['type'] != 'TVSeries':
-                print(r, document)
-                continue
+                mondb.update_one({'_id': dbid}, {'$set': {'type': 'TVSeries'}})
             sid = r['tv_results'][0]['id']
             tv = TV()
             series = tv.details(sid)

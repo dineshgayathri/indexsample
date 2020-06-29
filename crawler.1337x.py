@@ -6,7 +6,6 @@ import os
 import codecs
 import urllib.parse
 import re
-import random
 from configparser import ConfigParser
 
 parser = ConfigParser()
@@ -94,7 +93,7 @@ def scrape_this(root_url : str, sitemap_file : str):
             to_scrap.append(loc.text)
 
         print("Going over XMLs...")
-        for url in random.sample(to_scrap, parser.getint('1337x', 'to_scrap')): #XXX to_scrap
+        for url in help_routines.sample(to_scrap, parser.getint('1337x', 'to_scrap')): #XXX to_scrap
             print(url)
             source = requests.get(url).text
             soup = bs4.BeautifulSoup(source, 'xml')
@@ -115,7 +114,7 @@ def scrape_this(root_url : str, sitemap_file : str):
     print("going over {} pages".format(len(pages)))
     err_count = 0
     # for url in pages:
-    for url in random.sample(pages, parser.getint('1337x', 'pages')):
+    for url in help_routines.sample(pages, parser.getint('1337x', 'pages')):
 
         print(url)
         source = requests.get(url).text

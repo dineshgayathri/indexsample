@@ -2,7 +2,6 @@ import rarbgapi
 from rarbgapi.rarbgapi import request
 import pymongo
 import re
-import random
 from configparser import ConfigParser
 
 parser = ConfigParser()
@@ -38,7 +37,7 @@ for document in magnets.find({'dbid': {'$exists': True}}):
 
 added = 0
 err_count = 0
-for dbid, title in random.sample(dbids.items(), parser.getint('rarbg', 'ids')):
+for dbid, title in help_routines.sample(dbids.items(), parser.getint('rarbg', 'ids')):
 
     try:
         c = rarbgclient.search_imdb(dbid, limit=100, format_="json_extended")

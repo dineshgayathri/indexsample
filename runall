@@ -15,4 +15,6 @@ python3 fix_tv.py
 
 python3 enhancer.nzbhydra2.py
 
+python3 create_download_list.py
+
 python3 download_files.py

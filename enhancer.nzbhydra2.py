@@ -1,8 +1,8 @@
 import pymongo
-import random
 import configparser
 import requests
 import os.path
+import help_routines
 from configparser import ConfigParser
 
 parser = ConfigParser()
@@ -54,6 +54,9 @@ def search(query=None,db=None, id_=None, category=None, season=None, episode=Non
 def search_tv_by_imdb(imdb_id, season=None,episode=None):
     return search(db="imdb", id_=imdb_id, category="tv", season=season, episode=episode)
 
+def search_movie_by_imdb(imdb_id):
+    return search(db="imdb", id_=imdb_id, category="movie")
+
 def parse_response(res):
     l = []
     items = res["channel"]["item"]
@@ -89,34 +92,43 @@ def fetch_nzb(nzb, outdir=None):
 
 client = pymongo.MongoClient()
 
-cdb = client['magnets']
-magnets=cdb.magnets
-nzbs=cdb.nzbs
+cdb1 = client['magnets']
+magnets=cdb1.magnets
+nzbs=cdb1.nzbs
 
-dbids = {}
-for document in magnets.find():
-    if 'dbid' not in document:
-        continue
+cdb2 = client['imdb']
+imdb=cdb2.imdb
 
-    dbids[document['dbid']] = document['title']
+dbids = set()
+for document in magnets.find({'dbid': {'$exists': True}}):
+
+    dbids.add(document['dbid'])
+
+dbids_to_search = {}
+for dbid in dbids:
+    document = imdb.find_one({'_id': dbid})
+    dbids_to_search[dbid] = document
 
 added = 0
 err_count = 0
-for dbid, title in random.sample(dbids.items(), parser.getint('nzb', 'ids')): #XXX dbids.items()
+for dbid, document in help_routines.sample(dbids_to_search.items(), parser.getint('nzb', 'ids')): #XXX dbids_to_search.items()
 
     try:
-        # XXX search_tv_by_imdb() supports search by season & episode - we can use that
-        # XXX This could be useful NZBHydra maxes out at 500 results (and indexers can max
-        # XXX out even earlier)
-        r = search_tv_by_imdb(dbid)
-        c=parse_response(r)
+        if document['type'] == 'Movie':
+            r = search_movie_by_imdb(dbid)
+            c=parse_response(r)
+        else:
+            # XXX search_tv_by_imdb() supports search by season & episode - we can use that
+            # XXX This could be useful NZBHydra maxes out at 500 results (and indexers can max
+            # XXX out even earlier)
+            r = search_tv_by_imdb(dbid)
+            c=parse_response(r)
     except:
         continue
-    for nzb in c:
-        season = nzb['season'] if 'season' in nzb else '?'
-        ep = nzb['episode'] if 'episode' in nzb else '?'
-        print(f"Adding {nzb['name']} ({title} S{season}E{ep})")
+    for nzb in help_routines.sample(c,parser.getint('nzb','pages')):  #XXX c:
+        print(f"Adding {nzb['name']} ({document['title']})")
         try:
+            nzb['type'] = document['type']
             nzbs.insert_one(nzb)
             added += 1
         except pymongo.errors.DuplicateKeyError:

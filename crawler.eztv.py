@@ -5,7 +5,6 @@ import codecs
 import time
 import pymongo
 import re
-import random
 from configparser import ConfigParser
 
 parser = ConfigParser()
@@ -39,7 +38,7 @@ def scrape_this(root_url : str, ll, sitemap_file : str):
             to_scrap.append(url)
 
         print("Going over XMLs...")
-        for url in random.sample(to_scrap, parser.getint('eztv', 'to_scrap')):
+        for url in help_routines.sample(to_scrap, parser.getint('eztv', 'to_scrap')):
             print(url)
             source = requests.get(url).text
             try:
