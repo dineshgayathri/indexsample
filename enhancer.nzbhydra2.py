@@ -73,7 +73,7 @@ def parse_response(res):
             if a["name"] in ("episode", "tvrageid", "season", "dbid", "tvmazeid"):
                 ep[a["name"]]=a["value"]
             elif a["name"] == "imdbid":
-                ep['tvdbid'] = 'tt'+a["value"]
+                ep['dbid'] = 'tt'+a["value"]
             elif a["name"] == "guid":
                 ep['_id'] = a["value"]
         l.append(ep)

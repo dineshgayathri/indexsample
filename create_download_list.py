@@ -74,7 +74,7 @@ for document in nzbs.find():
         else:
             info[key] = str(value)
 
-    if 'season' not in info or 'episode' not in info:
+    if document['type'] == 'Movie':
         value = {'guid': document['_id'], 'name': name}
         downloads.update_one(
             {'_id': info['title']},
@@ -84,7 +84,15 @@ for document in nzbs.find():
             }, upsert=True
         )
     else:
-        if isinstance(info['episode'], list):
+        if 'season' not in info:
+            continue
+        if isinstance(info['season'], list):
+            continue
+        
+        if 'episode' not in info:
+            im = imdb.find_one({'_id': document['dbid']})
+            episodes = range(1, 1+im['seasons']['S%02d' % (info['season'],)])
+        elif isinstance(info['episode'], list):
             episodes = info['episode']
         else:
             episodes = [info['episode']]
