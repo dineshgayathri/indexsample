@@ -1,0 +1,18 @@
+#bin/bash
+
+python3 imdb.py
+
+python3 crawler.1337x.py
+python3 crawler.limetorrents.py
+python3 crawler.eztv.py
+python3 crawler.yts.py
+python3 crawler.offlinebay.py
+
+python3 fix_imdb.py
+python3 enhancer.rarbg.py
+python3 resolve_magnets.py
+python3 fix_tv.py
+
+python3 enhancer.nzbhydra2.py
+
+python3 download_files.py
