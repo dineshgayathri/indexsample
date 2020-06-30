@@ -75,13 +75,6 @@ VIDEO_SCORE = {
         "asf"      : 0.3,
         "mkv"      : 0.8,
     },
-    'release_group' : {
-        '$weight'  : 1,
-        "$missing" : 0.3,
-        "$other"   : 0.6,
-
-        "ntb"      : 1.0,
-    },
     'screen_size': {
         '$weight'  : 2,
         "$missing" : 0.5,
