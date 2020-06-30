@@ -1,6 +1,7 @@
 import pymongo
 import guessit
 import os
+import rank
 
 include_video_ext = set()
 include_video_ext.add('.mkv')
@@ -37,23 +38,23 @@ for document in magnets.find({'files': {'$exists': True}}):
                     info[key] = str(value)
 
             if 'season' not in info or 'episode' not in info:
-                value = {'hash': document['_id'], 'name': name, 'size': size}
+                value = {'hash': document['_id'], 'name': name, 'size': size, 'extra': info}
                 downloads.update_one(
                     {'_id': document['title']},
                     {
                         '$set': {'title': document['title'], 'dbid': document['dbid']},
-                        '$push': {'files': value, 'extra': info}
+                        '$push': {'files': value}
                     }, upsert=True
                 )
             else:
                 episode = 'S%02dE%02d' % (info['season'], info['episode'],)
                 key = '%s\t%s' % (document['title'], episode,)
-                value = {'hash': document['_id'], 'name': name, 'size': size}
+                value = {'hash': document['_id'], 'name': name, 'size': size, 'extra': info}
                 downloads.update_one(
                     {'_id': key},
                     {
                         '$set': {'title': document['title'], 'dbid': document['dbid'], 'episode': episode},
-                        '$push': {'files': value, 'extra': info}
+                        '$push': {'files': value}
                     }, upsert=True
                 )
 
@@ -75,12 +76,12 @@ for document in nzbs.find():
             info[key] = str(value)
 
     if document['type'] == 'Movie':
-        value = {'guid': document['_id'], 'name': name}
+        value = {'guid': document['_id'], 'name': name, 'extra': info}
         downloads.update_one(
             {'_id': info['title']},
             {
                 '$set': {'title': info['title']},
-                '$push': {'files': value, 'extra': info}
+                '$push': {'files': value}
             }, upsert=True
         )
     else:
@@ -99,11 +100,15 @@ for document in nzbs.find():
         for e in episodes:
             episode = 'S%02dE%02d' % (info['season'], e,)
             key = '%s\t%s' % (info['title'], e,)
-            value = {'guid': document['_id'], 'name': name}
+            value = {'guid': document['_id'], 'name': name, 'extra': info}
             downloads.update_one(
                 {'_id': key},
                 {
                     '$set': {'title': info['title'], 'dbid': document['dbid'], 'episode': episode},
-                    '$push': {'files': value, 'extra': info}
+                    '$push': {'files': value}
                 }, upsert=True
             )
+
+for document in downloads.find():
+    files = sorted(document['files'], key=rank.score)
+    downloads.update_one({'_id': document['_id']}, {'$set': {'files': files}})

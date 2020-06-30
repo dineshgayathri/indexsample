@@ -14,7 +14,6 @@ parser.read('config.ini')
 NH_SERVER = parser.get('nzbhydra2', 'host')
 API_KEY = parser.get('nzbhydra2', 'key')
 
-
 # check https://github.com/mrobinsn/go-newznab/blob/cd89d9c56447859fa1298dc9a0053c92c45ac7ef/newznab/newznab.go
 
 def search(query=None,db=None, id_=None, category=None, season=None, episode=None):

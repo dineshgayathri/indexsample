@@ -105,6 +105,7 @@ VIDEO_SCORE = {
         "$weight" : 1,
         "$missing" : 0.8,
         "$other" : 0.8,
+        "$reduce": max,
 
         'AC3' : 1.0,
         "MP3" : 0.9,
@@ -148,12 +149,11 @@ sum_weights = sum([VIDEO_SCORE[x]['$weight'] for x in VIDEO_SCORE])
 
 release_group_re = re.compile(r"(.*) *\[.*\]")
 
-def score(name : str) -> float:
+def score(record) -> float:
     def score_helper(v, data):
         x = str(v)
         return data[x] if x in data else data['$other']
-    info = guessit.guessit(name)
-    print(info)
+    info = record['extra']
 
     sum_log = 0
     for attr, data in VIDEO_SCORE.items():
@@ -167,7 +167,6 @@ def score(name : str) -> float:
                 m = release_group_re.match(val)
                 if m:
                     val = m.group(1)
-                    print(f"release group: {val}")
 
             if isinstance(val, list):
                 avg_func = data['$reduce']
@@ -183,29 +182,3 @@ def score(name : str) -> float:
         sum_log += log(score)*weight
     return exp(sum_log/sum_weights)
 
-episodes = [
-    "Close Calls On Camera S07E15 XviD-AFG [eztv]",
-    "Good Bones S05E04 The Greenwich Village Townhome WEB h264-ROBOTS [eztv]",
-    "pointless.s20e32.hdtv-norite[eztv.io].mkv",
-    "Fuck.Thats.Delicious.S04E08.Americas.Food.Capital.XviD-AFG[eztv.io].avi",
-    "Dexter 7x07 (HDTV-x264-ASAP) [eztv]",
-    "Dexter S06E01 720p HDTV x264-IMMERSE",
-    "Fear.the.Walking.Dead.-.Season.2.epi.02.XviD.Eng.Ac3-5.1.sub.ita.eng.iCV-MIRCrew"
-]
-movies = [
-    "The Forever Purge.2020.1080p WEBRip x264-vhfv.mp4",
-    "Scheme.Birds.2019.HDRip.XviD.AC3-EVO.avi",
-    "Mulan 2020 BluRay 1080p DTSHD 5 1 x264-LEGi0N[EtHD].mp4",
-    "Tenet 2020 [720p] [WEBRip] [YTS MX].mp4",
-    "my.bloody.valentine.1981.oar.remastered.uncut.720p.bluray.hevc.x265.rmteam.mkv"
-]
-
-for x in episodes:
-    print(x)
-    w = score(x)
-    print(w)
-
-for x in movies:
-    print(x)
-    w = score(x)
-    print(w)

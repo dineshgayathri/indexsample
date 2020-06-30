@@ -5,8 +5,6 @@ from configparser import ConfigParser
 parser = ConfigParser()
 parser.read('config.ini')
 
-
-
 def main():
     tmdb = TMDb()
     tmdb.api_key = parser.get('tmdb', 'key')
