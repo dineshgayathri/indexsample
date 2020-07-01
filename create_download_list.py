@@ -2,6 +2,7 @@ import pymongo
 import guessit
 import os
 import rank
+import help_routines
 
 include_video_ext = set()
 include_video_ext.add('.mkv')
@@ -89,17 +90,10 @@ for document in nzbs.find():
             continue
         if isinstance(info['season'], list):
             continue
-        
-        if 'episode' not in info:
-            im = imdb.find_one({'_id': document['dbid']})
-            episodes = range(1, 1+im['seasons']['S%02d' % (info['season'],)])
-        elif isinstance(info['episode'], list):
-            episodes = info['episode']
-        else:
-            episodes = [info['episode']]
-        for e in episodes:
-            episode = 'S%02dE%02d' % (info['season'], e,)
-            key = '%s\t%s' % (info['title'], e,)
+
+        episodes = help_routines.build_episodes(imdb, document['dbid'], info)
+        for episode in episodes:
+            key = '%s\t%s' % (info['title'], episode,)
             value = {'guid': document['_id'], 'name': name, 'extra': info}
             downloads.update_one(
                 {'_id': key},
