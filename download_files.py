@@ -53,7 +53,6 @@ class Downloader():
         return len(self.active_queue) > self.queue_size
 
     def add_download(self, file, dbid, episode, files):
-        print(file, dbid, episode)
         self.last_id += 1
         id = self.last_id
         if 'hash' in file:
@@ -61,13 +60,16 @@ class Downloader():
             key = file['hash']
             doc = magnets.find_one({'_id': key})
             if 'magnet' in doc:
+                #XXX add download to queue
                 print("adding download to", dbid, episode, doc['magnet'])
             else:
+                #XXX add download to queue
                 print("adding download to", dbid, episode, doc['torrent'])
         else:
             type = DOWNLOADER_TYPE.NZB
             key = file['guid']
             doc = nzbs.find_one({'_id': key})
+            #XXX add download to queue
             print(dbid, episode, f"nzbs/{doc['name']}.nzb")
 
         if key in self.downloaded:
@@ -89,11 +91,11 @@ class Downloader():
         return state
 
     def move_download(self, state):
+        #XXX download ended move files to proper location
         print('move_download', state)
         path = parser.get('downloader', 'output_path') + '/' + state['dbid']
         if state.get('episode'):
             episodes = help_routines.build_episodes(imdb, state['dbid'], state['file']['extra'])
-            print(episodes)
             for episode in episodes:
                 path1 = path + '/' + episode
                 if not os.path.exists(path1):
@@ -103,6 +105,7 @@ class Downloader():
             touch(f"{path}/video.mkv")
 
     def check_state(self, id):
+        #XXX check status of download
         state = self.active_queue[id]
         if state['expired'] < datetime.now():
             if random.randint(1, 10) > 8:
@@ -123,13 +126,12 @@ class Downloader():
     def update_status(self, id, status):
         assert(id not in self.active_queue)
         self.ended_queue[id]['status'] = STATUS.Exhausted
-        print(id, STATUS.Exhausted)
 
 downloader = Downloader(parser.getint('downloader', 'queue_size'))
 
 for document in downloads.find():
     if 'dbid' not in document:
-        print('not dbid', document)
+        print('not dbid, ignoring')
         continue
     path = parser.get('downloader', 'output_path') + '/' + document['dbid']
     if not os.path.exists(path):
@@ -153,7 +155,6 @@ for document in downloads.find():
                 else:
                     prev_found = False
                     added_new = False
-                    print(state)
                     for file in state['files']:
                         if prev_found:
                             state = downloader.add_download(file, state['dbid'], state.get('episode'), state['files'])
