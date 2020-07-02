@@ -1,10 +1,9 @@
 import requests
-import os
 import json
-import codecs
 import time
 import pymongo
 import re
+import help_routines
 from configparser import ConfigParser
 
 parser = ConfigParser()
@@ -27,31 +26,24 @@ def scrape_mblock(movie_block) -> dict:
 def scrape_this(root_url : str, ll, sitemap_file : str):
 
     pages = []
-    if os.path.exists(sitemap_file):
-        with codecs.open(sitemap_file, 'r', encoding='utf-8') as f:
-            pages = json.load(f)
-    else:
-        to_scrap = []
+    to_scrap = []
 
-        for l in ll:
-            url = root_url % (l,)
-            to_scrap.append(url)
+    for l in ll:
+        url = root_url % (l,)
+        to_scrap.append(url)
 
-        print("Going over XMLs...")
-        for url in help_routines.sample(to_scrap, parser.getint('eztv', 'to_scrap')):
-            print(url)
-            source = requests.get(url).text
-            try:
-                j = json.loads(source)
-                for torrent in j['torrents']:
-                    pages.append(torrent)
-            except json.decoder.JSONDecodeError:
-                print('parse failed')
-                pass
-            time.sleep(0.1)
-
-        with codecs.open(sitemap_file, 'w', encoding='utf-8') as f:
-            json.dump(pages, f, ensure_ascii=False, indent=4)
+    print("Going over XMLs...")
+    for url in help_routines.sample(to_scrap, parser.getint('eztv', 'to_scrap')):
+        print(url)
+        source = requests.get(url).text
+        try:
+            j = json.loads(source)
+            for torrent in j['torrents']:
+                pages.append(torrent)
+        except json.decoder.JSONDecodeError:
+            print('parse failed')
+            pass
+        time.sleep(0.1)
 
     client = pymongo.MongoClient()
     cdb = client['magnets']

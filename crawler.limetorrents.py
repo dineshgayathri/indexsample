@@ -1,12 +1,11 @@
 import bs4
 import requests
-import os
-import codecs
 import re
 import time
 import pymongo
 import guessit
 from configparser import ConfigParser
+import help_routines
 
 parser = ConfigParser()
 parser.read('config.ini')
@@ -54,29 +53,20 @@ def scrape_mblock(movie_block):
 def scrape_this(root_url, ll, sitemap_file):
 
     pages = []
-    if os.path.exists(sitemap_file):
-        with codecs.open(sitemap_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                pages.append(line.strip())
-    else:
-        to_scrap = []
+    to_scrap = []
 
-        for l in ll:
-            url = root_url % (l,)
-            to_scrap.append(url)
+    for l in ll:
+        url = root_url % (l,)
+        to_scrap.append(url)
 
-        print("Going over XMLs...")
-        for url in help_routines.sample(to_scrap, parser.getint('limetorrents', 'to_scrap')): #XXX to_scrap
-            print(url)
-            source = requests.get(url).text
-            soup = bs4.BeautifulSoup(source, 'xml')
-            sitemap = soup.findAll('loc')
-            for loc in sitemap:
-                pages.append(loc.text)
-
-        with codecs.open(sitemap_file, 'w', encoding='utf-8') as f:
-            for line in pages:
-                f.write(line+'\n')
+    print("Going over XMLs...")
+    for url in help_routines.sample(to_scrap, parser.getint('limetorrents', 'to_scrap')): #XXX to_scrap
+        print(url)
+        source = requests.get(url).text
+        soup = bs4.BeautifulSoup(source, 'xml')
+        sitemap = soup.findAll('loc')
+        for loc in sitemap:
+            pages.append(loc.text)
 
     print("going over pages", len(pages))
 

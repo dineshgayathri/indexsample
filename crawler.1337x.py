@@ -2,8 +2,7 @@ import pymongo
 import bs4
 import requests
 import guessit
-import os
-import codecs
+import help_routines
 import urllib.parse
 import re
 from configparser import ConfigParser
@@ -70,40 +69,31 @@ def scrape_mblock(movie_block : bs4.BeautifulSoup) -> (dict, list):
 def scrape_this(root_url : str, sitemap_file : str):
 
     pages = []
-    if os.path.exists(sitemap_file):
-        print("Using existing sitemap file: {}".format(sitemap_file))
-        with codecs.open(sitemap_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                pages.append(line.strip())
-    else:
-        source = requests.get(urllib.parse.urljoin(root_url, "robots.txt")).text
-        url = None
-        for line in source.splitlines():
-            key, value = line.split(': ')
-            if key == 'Sitemap':
-                url = value
-                break
 
-        to_scrap = []
+    source = requests.get(urllib.parse.urljoin(root_url, "robots.txt")).text
+    url = None
+    for line in source.splitlines():
+        key, value = line.split(': ')
+        if key == 'Sitemap':
+            url = value
+            break
 
+    to_scrap = []
+
+    source = requests.get(url).text
+    soup = bs4.BeautifulSoup(source, 'xml')
+    sitemap = soup.findAll('loc')
+    for loc in sitemap:
+        to_scrap.append(loc.text)
+
+    print("Going over XMLs...")
+    for url in help_routines.sample(to_scrap, parser.getint('1337x', 'to_scrap')): #XXX to_scrap
+        print(url)
         source = requests.get(url).text
         soup = bs4.BeautifulSoup(source, 'xml')
         sitemap = soup.findAll('loc')
         for loc in sitemap:
-            to_scrap.append(loc.text)
-
-        print("Going over XMLs...")
-        for url in help_routines.sample(to_scrap, parser.getint('1337x', 'to_scrap')): #XXX to_scrap
-            print(url)
-            source = requests.get(url).text
-            soup = bs4.BeautifulSoup(source, 'xml')
-            sitemap = soup.findAll('loc')
-            for loc in sitemap:
-                pages.append(loc.text)
-
-        with codecs.open(sitemap_file, 'w', encoding='utf-8') as f:
-            for line in pages:
-                f.write(line+'\n')
+            pages.append(loc.text)
 
     hash_re = re.compile('btih:([0-9|A-Z|a-z]*)&.*')
 
