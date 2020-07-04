@@ -2,6 +2,7 @@ import pymongo
 import help_routines
 import requests
 import bs4
+import json
 
 nf = set()
 def get_imdb_title(imdb, monsectvdb, monsecmoviedb, dbid):
@@ -12,16 +13,18 @@ def get_imdb_title(imdb, monsectvdb, monsecmoviedb, dbid):
     url = 'https://www.imdb.com/title/%s/' % (dbid,)
     print(url)
     source = requests.get(url).text
-
+    
     soup = bs4.BeautifulSoup(source, 'html.parser')
 
     try:
-        script = soup.findsoup.find('script', type='application/ld+json').text
+        scripttext = soup.find('script', type='application/ld+json').contents
     except:
         nf.add(dbid)
         return None
 
-    data = {'_id': dbid, 'title': script['name'], 'href': script['url'], 'type': script['@type']}
+    script = json.loads(scripttext[0])
+    title = script['name']
+    data = {'_id': dbid, 'title': title, 'href': script['url'], 'type': script['@type']}
     imdb.insert_one(data)
 
     try:

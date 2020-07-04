@@ -3,6 +3,7 @@ from rarbgapi.rarbgapi import request
 import pymongo
 import re
 from configparser import ConfigParser
+import help_routines
 
 parser = ConfigParser()
 parser.read('config.ini')
@@ -33,6 +34,8 @@ magnets=cdb.magnets
 
 dbids = {}
 for document in magnets.find({'dbid': {'$exists': True}}):
+    if 'title' not in document:
+        continue
     dbids[document['dbid']] = document['title']
 
 added = 0
