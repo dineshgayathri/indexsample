@@ -48,7 +48,7 @@ def parse_torrent(torrent):
         for file in torrent["info"]["files"]:
             files.append({'path': file["path"], 'size': file["length"]})
         return files
-    except TypeError:
+    except (TypeError, ValueError):
         print('error', torrent)
         return False
 

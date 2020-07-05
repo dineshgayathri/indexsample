@@ -19,6 +19,7 @@ def get_imdb_title(imdb, monsectvdb, monsecmoviedb, dbid):
     try:
         scripttext = soup.find('script', type='application/ld+json').contents
     except:
+        print(dbid, 'not found')
         nf.add(dbid)
         return None
 
@@ -69,11 +70,14 @@ for document in magnets.find():
             else:
                 updates[document['_id']] = {'$unset': {'dbid': ''}}
     else:
-        if 'title' in document:
-            im = imdb.find_one({'_id': help_routines.fix_name(document['title'])})
-            if im:
-                t = imdb.find_one({'_id': im['dbid']})
-                updates[document['_id']] = {'$set': {'dbid': im['dbid'], 'title': t['title']}}
+        if 'title' not in document:
+            continue
+        if not isinstance(document['title'], str):
+            continue
+        im = imdb.find_one({'_id': help_routines.fix_name(document['title'])})
+        if im:
+            t = imdb.find_one({'_id': im['dbid']})
+            updates[document['_id']] = {'$set': {'dbid': im['dbid'], 'title': t['title']}}
 
 for key, data in updates.items():
     if data:

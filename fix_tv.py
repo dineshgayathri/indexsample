@@ -39,7 +39,8 @@ def main():
                 seasons['S%02d' % season['season_number']] = season['episode_count']
             updates['seasons'] = seasons
         else:
-            assert(document['type'] == 'Movie')
+            if document['type'] != 'Movie':
+                mondb.update_one({'_id': dbid}, {'$set': {'type': 'Movie'}})
             continue
 
         mondb.update_one({'_id': dbid}, {'$set': updates})
