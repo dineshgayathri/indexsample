@@ -8,6 +8,7 @@ import sys
 import help_routines
 
 #need to run more than once, because of multiple files torrents that can fail
+#the easiest way is to download subtitles by file hash and language both in open_subtitles and in addic7ed
 
 parser = ConfigParser()
 parser.read('config.ini')
