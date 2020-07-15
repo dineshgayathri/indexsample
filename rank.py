@@ -72,7 +72,7 @@ VIDEO_SCORE = {
         "$other"   : 0.5,
 
         "mp4"      : 1,
-        "asf"      : 0.3,
+        "avi"      : 0.3,
         "mkv"      : 0.8,
     },
     'screen_size': {

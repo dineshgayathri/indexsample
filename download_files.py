@@ -6,6 +6,10 @@ from datetime import datetime, timedelta
 import random
 import sys
 import help_routines
+from pythonopensubtitles.opensubtitles import OpenSubtitles
+from pythonopensubtitles.utils import File
+import tempfile
+import shutil
 
 #need to run more than once, because of multiple files torrents that can fail
 #the easiest way is to download subtitles by file hash and language both in open_subtitles and in addic7ed
@@ -23,6 +27,26 @@ downloads = cdb2.downloads
 
 cdb3 = client['imdb']
 imdb = cdb3.imdb
+
+ost = OpenSubtitles() 
+ost.login(parser.get('sub','user'), parser.get('sub','pass'))
+
+def download_subtitles(folder, file):
+    video_path = os.path.join(folder, file)
+    f = File(video_path)
+
+    data = ost.search_subtitles([{'sublanguageid': 'all', 'moviehash': f.get_hash(), 'moviebytesize': f.size}])
+    if data:
+        id_subtitle_file = data[0].get('IDSubtitleFile')
+
+        tempdir = tempfile.mkdtemp()
+        d = ost.download_subtitles([id_subtitle_file], output_directory=tempdir, extension='srt')
+        for k, v in d.items():
+            pre, ext = os.path.splitext(video_path)
+            os.rename(v, pre + '.srt')
+        shutil.rmtree(tempdir, ignore_errors=True)
+
+    sys.exit(9)
 
 class STATUS():
     Queued = 'Queued'
@@ -102,8 +126,16 @@ class Downloader():
                 if not os.path.exists(path1):
                     os.mkdir(path1)
                 touch(f"{path1}/video.mkv")
+                if state['file']['extra']['exact_sub'] > 0:
+                    touch(f"{path1}/video.srt")
+                else:
+                    download_subtitles(path1, "video.mkv")
         else:
             touch(f"{path}/video.mkv")
+            if state['file']['extra']['exact_sub'] > 0:
+                touch(f"{path}/video.srt")
+            else:
+                download_subtitles(path, "video.mkv")
 
     def check_state(self, id):
         #XXX check status of download
