@@ -28,5 +28,6 @@ FlixGrab and FlixGrab+ are two other options (there are many others).
 
 ## Get a list of URLs to download
 FlixiCam (and other downloaders) need a URL to start downloading from. This can be a link to the episode - or (at least with FlixiCam) a link to the series (e.g. http://www.netflix.com/title/...).
-
+uNoGS offer an API (via RapidAPI. https://rapidapi.com/unogs/api/unogsng) which can be used to create a list of URLs that can be imported into the Netflix downloader.
+Note that you will need a credit card to use the API. If you don't have a credit card, you can buy a Visa gift card from eGifter (note you may need to use a VPN to appear to be in the US)
 
