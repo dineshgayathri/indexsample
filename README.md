@@ -1,4 +1,6 @@
-# Project Title
+* This project is not currently maintained! if anyone is interested in this project, feel free to fork it, and run with it
+
+# Video Index
 
 Build an index of all TV series and Movies available on bittorrent and usenet
 
