@@ -21,6 +21,8 @@ the main script is ./runnall
 in order to download content you may use Put.io and GetNZB services and adapt the download_files.py.
 all content will be deployed on ./files folder and the index will be available in mongodb
 
+(you will need to get the API keys e.g. for tvdb, moviedb etc. yourself)
+
 ## Authors
 
 * **Dinesh Gayathri** - *Initial work* - git@github.com:dineshgayathri/indexsample.git
