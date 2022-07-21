@@ -68,5 +68,5 @@ def scrape_this(root_url : str, ll, sitemap_file : str):
 
 
 # XXX why go over list like this - and then pass it to the function?!
-scrape_this("https://eztv.io/api/get-torrents?limit=100&page=%d", range(1, 2863), 'eztv.pages.json')
+scrape_this("https://eztv.ro/api/get-torrents?limit=100&page=%d", range(1, 2863), 'eztv.pages.json')
 
